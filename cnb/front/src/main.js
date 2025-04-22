@@ -4,23 +4,17 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import router from './router'
-// Add these imports to your main.js
+
+// 引入 Bootstrap CSS 和 JS
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
-// 引入 Bootstrap CSS
-import 'bootstrap/dist/css/bootstrap.min.css'
-// 引入 Bootstrap Icons
-import 'bootstrap-icons/font/bootstrap-icons.css'
+// 引入 Bootstrap Icons (需要先安裝: npm install bootstrap-icons)
+// import 'bootstrap-icons/font/bootstrap-icons.css'
+
 // 引入自訂樣式
 import './assets/styles/variables.css'
 import './assets/styles/global.css'
-
-// 引入 Bootstrap JS
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
-
-// 定義開發環境
-window.process = { env: { NODE_ENV: 'development' } }
 
 // 創建 Pinia 實例並使用持久化插件
 const pinia = createPinia()
