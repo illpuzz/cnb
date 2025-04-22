@@ -1,13 +1,9 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import ReviewList from '../views/ReviewList.vue'
-import ReviewDetail from '../views/ReviewDetail.vue'
-import ReportView from '../views/ReportView.vue'
-import AboutView from '../views/AboutView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.url),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -17,24 +13,24 @@ const router = createRouter({
     {
       path: '/reviews',
       name: 'reviews',
-      component: ReviewList
+      component: () => import('../views/ReviewList.vue')
     },
     {
       path: '/reviews/:id',
       name: 'review-detail',
-      component: ReviewDetail,
+      component: () => import('../views/ReviewDetail.vue'),
       props: true
     },
     {
-      path: '/report/:reviewId',
+      path: '/report/:id',
       name: 'report',
-      component: ReportView,
+      component: () => import('../views/ReportView.vue'),
       props: true
     },
     {
       path: '/about',
       name: 'about',
-      component: AboutView
+      component: () => import('../views/AboutView.vue')
     }
   ]
 })
