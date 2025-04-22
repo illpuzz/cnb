@@ -1,3 +1,4 @@
+// src/stores/review.js
 import { defineStore } from 'pinia'
 import { reviewService } from '../services/reviewService'
 
@@ -9,6 +10,7 @@ export const useReviewStore = defineStore('review', {
     error: null,
     totalPages: 1,
     currentPage: 1,
+    totalElements: 0,
     campsite: { id: 1, name: '苗栗區 山之間' } // 預設營地
   }),
   
@@ -20,25 +22,25 @@ export const useReviewStore = defineStore('review', {
     averageRating: (state) => {
       if (state.reviews.length === 0) return 0
       const sum = state.reviews.reduce((acc, review) => acc + review.overallRating, 0)
-      return (sum / state.reviews.length).toFixed(1)
+      return parseFloat((sum / state.reviews.length).toFixed(1))
     },
     
     averageCleanlinessRating: (state) => {
       if (state.reviews.length === 0) return 0
-      const sum = state.reviews.reduce((acc, review) => acc + review.cleanlinessRating, 0)
-      return (sum / state.reviews.length).toFixed(1)
+      const sum = state.reviews.reduce((acc, review) => acc + (review.cleanlinessRating || 0), 0)
+      return parseFloat((sum / state.reviews.length).toFixed(1))
     },
     
     averageConvenienceRating: (state) => {
       if (state.reviews.length === 0) return 0
-      const sum = state.reviews.reduce((acc, review) => acc + review.convenienceRating, 0)
-      return (sum / state.reviews.length).toFixed(1)
+      const sum = state.reviews.reduce((acc, review) => acc + (review.convenienceRating || 0), 0)
+      return parseFloat((sum / state.reviews.length).toFixed(1))
     },
     
     averageFriendlinessRating: (state) => {
       if (state.reviews.length === 0) return 0
-      const sum = state.reviews.reduce((acc, review) => acc + review.friendlinessRating, 0)
-      return (sum / state.reviews.length).toFixed(1)
+      const sum = state.reviews.reduce((acc, review) => acc + (review.friendlinessRating || 0), 0)
+      return parseFloat((sum / state.reviews.length).toFixed(1))
     }
   },
   
@@ -50,6 +52,7 @@ export const useReviewStore = defineStore('review', {
         this.reviews = response.content
         this.totalPages = response.totalPages
         this.currentPage = response.number + 1
+        this.totalElements = response.totalElements
         this.error = null
       } catch (error) {
         console.error('獲取評價失敗:', error)
@@ -80,7 +83,7 @@ export const useReviewStore = defineStore('review', {
       try {
         const data = await reviewService.createReview({
           ...reviewData,
-          campSiteId: this.campsite.id
+          campSiteId: reviewData.campSiteId || this.campsite.id
         })
         this.reviews.unshift(data)
         this.error = null
@@ -143,7 +146,7 @@ export const useReviewStore = defineStore('review', {
           this.reviews[index] = {
             ...review,
             userLikeStatus: newStatus,
-            likeCount: review.likeCount + likeDelta
+            likeCount: (review.likeCount || 0) + likeDelta
           }
         }
         
@@ -155,7 +158,7 @@ export const useReviewStore = defineStore('review', {
           this.currentReview = {
             ...this.currentReview,
             userLikeStatus: newStatus,
-            likeCount: this.currentReview.likeCount + likeDelta
+            likeCount: (this.currentReview.likeCount || 0) + likeDelta
           }
         }
         
@@ -173,12 +176,22 @@ export const useReviewStore = defineStore('review', {
         this.reviews = response.content
         this.totalPages = response.totalPages
         this.currentPage = response.number + 1
+        this.totalElements = response.totalElements
         this.error = null
       } catch (error) {
         console.error('搜尋評價失敗:', error)
         this.error = '搜尋評價失敗，請稍後再試'
       } finally {
         this.loading = false
+      }
+    },
+
+    async getAverageRating(campSiteId) {
+      try {
+        return await reviewService.getAverageRating(campSiteId || this.campsite.id)
+      } catch (error) {
+        console.error('獲取平均評分失敗:', error)
+        return 0
       }
     }
   },
